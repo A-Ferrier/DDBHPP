@@ -26,12 +26,12 @@ function [t, alpha, beta] = DDBHNPP_output_sample(N, Delta, U, F, J, tf, nsample
     
         %On first run of loop allocate memory
         if nsample == 1
-            alpha = cell(nsamples, 1);
-            beta = cell(nsamples, 1);
+            alpha = zeros(nsamples, length(t), N);
+            beta = zeros(nsamples, length(t), N);
         end
     
-        alpha{nsample} = alphaC;
-        beta{nsample} = betaC;
+        alpha(nsample,:,:) = alphaC;
+        beta(nsample,:,:) = betaC;
         
     end
 end 
