@@ -1,5 +1,7 @@
 function str = correctnum2str(num)
 
+% Alternative num2str with specific formatting
+
     if(mod(num, 1) == 0)
         
         str = num2str(num, '%.1f');
