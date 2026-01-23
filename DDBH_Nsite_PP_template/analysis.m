@@ -1,17 +1,19 @@
+% Overhead for Matlab postprocessing code
 
 %Input system parameters
-N = 3;
-Delta = 0.1;
-U = 0.1;
-F = 1.0;
-J = 0.45;
-tf = 1000;
+N = 3; % Number of sites
+Delta = 0.1; % On-site energy detuning
+U = 0.1; % Interaction
+F = 1.0; % Coherent drive
+J = 0.45; % Hopping
+tf = 1000; % Final time
 
 %Input number of realisations
 nsamples = 1000;
 
 %Add all relevant directories to path
-addpath('/home/ucapfer/Scratch/matlab_code')
+toolspath = '../matlab_tools' % Set to matlab_tools directory location
+addpath(toolspath)
 addpath('./')
 for ns = 1:nsamples
     addpath(['./Re' num2str(ns)])
