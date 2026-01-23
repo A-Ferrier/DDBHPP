@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simulation xmds-version="2">
+
+  <author>
+    A Ferrier
+  </author>
+
+  <description>
+    Driven-Dissipative Bose-Hubbard model
+    for N sites in 1 dimensional chain
+    Positive P version
+  </description>
+
+  <features>
+    <benchmark />
+    <bing />
+    <halt_non_finite />
+    <auto_vectorise />
+    <validation kind="run-time" />
+    <arguments>
+
+      <!-- Numerical Specifications -->
+      <argument name="Ttot" type="real" default_value="100"	/>
+      
+      <!-- Number of Sites -->
+      <argument name="N" type="integer" default_value="3"    />
+
+      <!-- Parameter Specifications -->
+      <argument name="Kappa" type="real" default_value="0.5"	/>
+      <argument name="Uint" type="real" default_value="1.5"	        />
+      <argument name="Delta" type="real" default_value="-2.0"      />
+      <argument name="Jhop" type="real" default_value="1.0"      />
+           
+      <!-- Pump Specifications -->
+      <argument name="FPmp" type="real" default_value="1.0" />
+
+      <!-- Seeding noise vector. -->
+      <argument name="seed1" type="integer" default_value="8"	/>
+      <argument name="seed2" type="integer" default_value="6"   />
+      <argument name="seed3" type="integer" default_value="5"   />
+
+    </arguments>
+  </features> 
+
+  <geometry>
+    <propagation_dimension>
+      t
+    </propagation_dimension>
+    <transverse_dimensions>
+      <dimension name="j" type="integer" lattice="N" domain="(1,N)" />
+    </transverse_dimensions>
+  </geometry>
+
+
+<!-- %% Initialise from previous output
+<vector name="wavefunction" type="complex" dimensions="">
+    <components>
+      alpha
+    </components>
+    <initialisation kind="hdf5">
+    <filename>  </filename>
+  </initialisation>
+  </vector>
+%%% -->
+
+<!-- %%%% Fixed initial state  %% -->
+  <vector name="wavefunction" type="complex" dimensions="j">
+    <components>
+      alpha
+      beta
+    </components>
+    <initialisation>
+      <![CDATA[
+        alpha = 0;
+	beta = 0;
+       ]]>
+    </initialisation>
+  </vector>
+
+<!--- %%%%% Hopping coefficients j -> j+1 and j -> j-1 for each site,
+      can also be used to define boundary conditions.  All = Jhop means uniform hopping on ring (periodic boundaries) -->
+<vector name="hoppings" type="real" dimensions="j">
+    <components>
+      J_hop_plus J_hop_minus
+    </components>
+    <initialisation>
+      <![CDATA[
+        J_hop_plus = Jhop;
+	J_hop_minus = Jhop;
+       ]]>
+    </initialisation>
+  </vector>
+
+  <noise_vector name="QNoise" dimensions="j" kind="wiener" type="real" method="dsfmt" seed="seed1 seed2 seed3">
+    <components>
+      XiA
+      XiB
+    </components>
+  </noise_vector>
+
+  <sequence>
+    <integrate algorithm="RK4" interval="Ttot" steps="100000">
+      <samples>
+        1000
+      </samples>     
+
+      <operators>
+
+        <dependencies>
+          QNoise hoppings
+        </dependencies>
+
+        <integration_vectors>
+          wavefunction
+        </integration_vectors>
+ 
+        <![CDATA[                                                                        
+      	  int j_plus = (j%N) + 1;
+	  int j_minus = N - (N+1-j)%N;
+	  
+          dalpha_dt(j => j) = i*Delta*alpha(j => j) -Kappa*alpha(j => j) -i*Uint*alpha(j => j)*beta(j => j)*alpha(j => j) +0.5*i*Uint*alpha(j => j) 
+		+i*J_hop_plus(j => j)*alpha(j => j_plus) +i*J_hop_minus(j => j)*alpha(j => j_minus) -i*FPmp +sqrt(i*Uint)*i*alpha(j => j)*XiA(j => j);
+
+	  dbeta_dt(j => j) = -i*Delta*beta(j => j) -Kappa*beta(j => j) +i*Uint*beta(j => j)*alpha(j => j)*beta(j => j) -0.5*i*Uint*beta(j => j) 
+		-i*J_hop_plus(j => j)*beta(j => j_plus) -i*J_hop_minus(j => j)*beta(j => j_minus) +i*FPmp +sqrt(i*Uint)*beta(j => j)*XiB(j => j);
+        ]]>
+      </operators>
+
+    </integrate>
+
+  </sequence>
+
+<!-- %%%%%%%%%%%%%% Alex's Saving data %%%%%%%%%%%%%%%%%%% -->
+
+  <output filename="file_output.xsil" format="hdf5">
+    <sampling_group basis="j" initial_sample="yes">
+      <dependencies>
+        wavefunction
+      </dependencies>
+      <moments>
+        alphaR
+        alphaI
+		betaR
+		betaI
+      </moments>
+      <![CDATA[
+        _SAMPLE_COMPLEX(alpha);
+	_SAMPLE_COMPLEX(beta);
+      ]]>
+    </sampling_group>
+
+  </output>
+
+</simulation>
