@@ -2,8 +2,8 @@
 % Code to check occupations & g2 for N site 1D DDBH Positive P with time & spatial averaging
 
 % Size and number of bins for error bar calculating process
-S_bin = nsamples/5;
-nbins = floor(nsamples/S_bin);
+S_bin = nsamples/5; % Bin size for subensemble averaging
+nbins = floor(nsamples/S_bin); % Number of subensembles
 
 % Set initial time sample
 init = 1+floor(length(t)/10);
@@ -15,21 +15,9 @@ means_g2 = zeros(nbins, 1);
 % Loop over bins
 for nb = 1:nbins
     
-    % Reset totalers
-    Running_tnumer = zeros(length(t), N);
-    Running_tdenom = zeros(length(t), N);
-    
-    % Loop over samples in bin
-    for ns = (S_bin*(nb-1)+1):S_bin*nb
-        
-        Running_tnumer = Running_tnumer + real((alpha{ns}.*beta{ns}).^2);
-        Running_tdenom = Running_tdenom + real(alpha{ns}.*beta{ns});
-
-    end
-   
     % Observables calculated for each bin...
-    n_Av_bin = mean(mean(Running_tdenom(init:end, :)))./S_bin;
-    g2_bin = mean(mean(Running_tnumer(init:end, :)))./S_bin./n_Av_bin.^2;
+    n_Av_bin =  real(mean(mean(mean(alpha((S_bin*(nb-1)+1):S_bin*nb,init:end,:).*beta((S_bin*(nb-1)+1):S_bin*nb,init:end,:), 1), 2), 3));
+    g2_bin = real(mean(mean(mean((alpha((S_bin*(nb-1)+1):S_bin*nb,init:end,:).*beta((S_bin*(nb-1)+1):S_bin*nb,init:end,:)).^2, 1), 2), 3))./n_Av_bin.^2;
     
     % ...and assigned to means vectors
     means_n_Av(nb) = n_Av_bin;
