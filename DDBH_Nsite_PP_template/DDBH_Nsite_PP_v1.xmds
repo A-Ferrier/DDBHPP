@@ -26,7 +26,7 @@
       <argument name="N" type="integer" default_value="3"    />
 
       <!-- Parameter Specifications -->
-      <argument name="Kappa" type="real" default_value="0.5"	/>
+      <argument name="gamma" type="real" default_value="1.0"	/>
       <argument name="Uint" type="real" default_value="1.5"	        />
       <argument name="Delta" type="real" default_value="-2.0"      />
       <argument name="Jhop" type="real" default_value="1.0"      />
@@ -51,20 +51,8 @@
     </transverse_dimensions>
   </geometry>
 
-
-<!-- %% Initialise from previous output
-<vector name="wavefunction" type="complex" dimensions="">
-    <components>
-      alpha
-    </components>
-    <initialisation kind="hdf5">
-    <filename>  </filename>
-  </initialisation>
-  </vector>
-%%% -->
-
-<!-- %%%% Fixed initial state  %% -->
-  <vector name="wavefunction" type="complex" dimensions="j">
+<!-- %% phase space variables, initial state 0  %% -->
+  <vector name="trajectory" type="complex" dimensions="j">
     <components>
       alpha
       beta
@@ -72,25 +60,38 @@
     <initialisation>
       <![CDATA[
         alpha = 0;
-	beta = 0;
+		beta = 0;
        ]]>
     </initialisation>
   </vector>
 
-<!--- %%%%% Hopping coefficients j -> j+1 and j -> j-1 for each site,
+<!-- Pumping, allowing for spatially non-uniform drive.  Default set to uniform all F = FPmp -->
+<vector name="pump" type="complex" dimensions="j">
+    <components>
+      F
+    </components>
+    <initialisation>
+      <![CDATA[
+        F = FPmp;
+       ]]>
+    </initialisation>
+  </vector>
+
+<!--- %% Hopping coefficients j -> j+1 and j -> j-1 for each site,
       can also be used to define boundary conditions.  All = Jhop means uniform hopping on ring (periodic boundaries) -->
-<vector name="hoppings" type="real" dimensions="j">
+<vector name="hoppings" type="complex" dimensions="j">
     <components>
       J_hop_plus J_hop_minus
     </components>
     <initialisation>
       <![CDATA[
         J_hop_plus = Jhop;
-	J_hop_minus = Jhop;
+		J_hop_minus = Jhop;
        ]]>
     </initialisation>
   </vector>
 
+<!--  %% Real Noise from interactions %% -->
   <noise_vector name="QNoise" dimensions="j" kind="wiener" type="real" method="dsfmt" seed="seed1 seed2 seed3">
     <components>
       XiA
@@ -98,6 +99,7 @@
     </components>
   </noise_vector>
 
+<!-- Integrate element to solve for trajectories -->
   <sequence>
     <integrate algorithm="RK4" interval="Ttot" steps="100000">
       <samples>
@@ -107,22 +109,20 @@
       <operators>
 
         <dependencies>
-          QNoise hoppings
+          QNoise hoppings pump
         </dependencies>
 
         <integration_vectors>
-          wavefunction
+          trajectory
         </integration_vectors>
  
         <![CDATA[                                                                        
       	  int j_plus = (j%N) + 1;
-	  int j_minus = N - (N+1-j)%N;
+	 	  int j_minus = N - (N+1-j)%N;
 	  
-          dalpha_dt(j => j) = i*Delta*alpha(j => j) -Kappa*alpha(j => j) -i*Uint*alpha(j => j)*beta(j => j)*alpha(j => j) +0.5*i*Uint*alpha(j => j) 
-		+i*J_hop_plus(j => j)*alpha(j => j_plus) +i*J_hop_minus(j => j)*alpha(j => j_minus) -i*FPmp +sqrt(i*Uint)*i*alpha(j => j)*XiA(j => j);
+          dalpha_dt(j => j) = i*Delta*alpha(j => j) -0.5*gamma*alpha(j => j) -i*Uint*alpha(j => j)*beta(j => j)*alpha(j => j) +0.5*i*Uint*alpha(j => j) +i*J_hop_plus(j => j)*alpha(j => j_plus) +i*J_hop_minus(j => j)*alpha(j => j_minus) -i*F +sqrt(i*Uint)*i*alpha(j => j)*XiA(j => j);
 
-	  dbeta_dt(j => j) = -i*Delta*beta(j => j) -Kappa*beta(j => j) +i*Uint*beta(j => j)*alpha(j => j)*beta(j => j) -0.5*i*Uint*beta(j => j) 
-		-i*J_hop_plus(j => j)*beta(j => j_plus) -i*J_hop_minus(j => j)*beta(j => j_minus) +i*FPmp +sqrt(i*Uint)*beta(j => j)*XiB(j => j);
+	  	  dbeta_dt(j => j) = -i*Delta*beta(j => j) -0.5*gamma*beta(j => j) +i*Uint*beta(j => j)*alpha(j => j)*beta(j => j) -0.5*i*Uint*beta(j => j) -i*J_hop_plus(j => j)*beta(j => j_plus) -i*J_hop_minus(j => j)*beta(j => j_minus) +i*conj(F) +sqrt(i*Uint)*beta(j => j)*XiB(j => j);
         ]]>
       </operators>
 
@@ -130,7 +130,7 @@
 
   </sequence>
 
-<!-- %%%%%%%%%%%%%% Alex's Saving data %%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%% Saving data %%%%%%%%%%%%%%%%%%% -->
 
   <output filename="file_output.xsil" format="hdf5">
     <sampling_group basis="j" initial_sample="yes">
@@ -145,7 +145,7 @@
       </moments>
       <![CDATA[
         _SAMPLE_COMPLEX(alpha);
-	_SAMPLE_COMPLEX(beta);
+		_SAMPLE_COMPLEX(beta);
       ]]>
     </sampling_group>
 
