@@ -1,13 +1,17 @@
 #!/bin/bash -l
 
-N=3; 
-Delta=0.1;
-Uint=0.1;
-FPmp=1.0;
-Jhop=0.45;
-time_run=1000;
+# Bash runscript for generating many stochastic trajectories from 1D DDBH positive-P simulations
 
-for s in 1..1000
+# Parameters; gamma = 1 taken as energy unit by default.  
+N=3; # Number of sites 
+Delta=0.1; # On-site energy detuning
+Uint=0.1; # Two-particle interaction strength
+FPmp=1.0; # Coherent drive amplitude
+Jhop=0.45; # Hopping strength
+time_run=1000; # end time of simulation
+
+for s in {1..1000} # Loop over 1 to total number of stochastic trajectories
+do
 
 	echo "Delta = ${Delta} U = ${Uint} F = ${FPmp} J = ${Jhop}  Re${s}"
 	
