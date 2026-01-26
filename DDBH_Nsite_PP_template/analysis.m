@@ -29,5 +29,5 @@ filenameout = ['analysis_output_DDBH_' num2str(N) 'Site_Delta' correctnum2str(De
 save(filenameout, 't');
 
 %List of scripts to process data
-DDBHNPP_check
+DDBHNPP_stAv
 
