@@ -18,7 +18,7 @@ do
 	mkdir Re${s}
 	cd Re${s}
 
-	../DDBH_Nsite_PP_v1 --N=${N} --Uint=${Uint} --FPmp=${FPmp} --Delta=${Delta} --Jhop=${Jhop} --Ttot=${time_run} --seed1=$RANDOM --seed2=$RANDOM --seed3=$RANDOM
+	../DDBH_Nsite_PP --N=${N} --Uint=${Uint} --FPmp=${FPmp} --Delta=${Delta} --Jhop=${Jhop} --Ttot=${time_run} --seed1=$RANDOM --seed2=$RANDOM --seed3=$RANDOM
 	
 	mv file_output.xsil file_output_${N}Site_Delta${Delta}_U${Uint}_F${FPmp}_J${Jhop}_tf${time_run}_Re${s}.xsil
 	mv file_output.h5 file_output_${N}Site_Delta${Delta}_U${Uint}_F${FPmp}_J${Jhop}_tf${time_run}_Re${s}.h5 
