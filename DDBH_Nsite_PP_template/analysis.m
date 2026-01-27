@@ -2,10 +2,10 @@
 
 %Input system parameters
 N = 3; % Number of sites
-Delta = 0.1; % On-site energy detuning
+Delta = 0.0; % On-site energy detuning
 U = 0.1; % Interaction
 F = 1.0; % Coherent drive
-J = 0.45; % Hopping
+J = 3.0; % Hopping
 tf = 1000; % Final time
 
 %Input number of realisations
