@@ -26,7 +26,7 @@
       <argument name="N" type="integer" default_value="3"    />
 
       <!-- Parameter Specifications -->
-      <argument name="gamma" type="real" default_value="1.0"	/>
+      <argument name="gam" type="real" default_value="1.0"	/>
       <argument name="Uint" type="real" default_value="1.5"	        />
       <argument name="Delta" type="real" default_value="-2.0"      />
       <argument name="Jhop" type="real" default_value="1.0"      />
@@ -120,9 +120,9 @@
       	  int j_plus = (j%N) + 1;
 	 	  int j_minus = N - (N+1-j)%N;
 	  
-          dalpha_dt(j => j) = i*Delta*alpha(j => j) -0.5*gamma*alpha(j => j) -i*Uint*alpha(j => j)*beta(j => j)*alpha(j => j) +0.5*i*Uint*alpha(j => j) +i*J_hop_plus(j => j)*alpha(j => j_plus) +i*J_hop_minus(j => j)*alpha(j => j_minus) -i*F +sqrt(i*Uint)*i*alpha(j => j)*XiA(j => j);
+          dalpha_dt(j => j) = i*Delta*alpha(j => j) -0.5*gam*alpha(j => j) -i*Uint*alpha(j => j)*beta(j => j)*alpha(j => j) +0.5*i*Uint*alpha(j => j) +i*J_hop_plus(j => j)*alpha(j => j_plus) +i*J_hop_minus(j => j)*alpha(j => j_minus) -i*F +sqrt(i*Uint)*i*alpha(j => j)*XiA(j => j);
 
-	  	  dbeta_dt(j => j) = -i*Delta*beta(j => j) -0.5*gamma*beta(j => j) +i*Uint*beta(j => j)*alpha(j => j)*beta(j => j) -0.5*i*Uint*beta(j => j) -i*J_hop_plus(j => j)*beta(j => j_plus) -i*J_hop_minus(j => j)*beta(j => j_minus) +i*conj(F) +sqrt(i*Uint)*beta(j => j)*XiB(j => j);
+	  	  dbeta_dt(j => j) = -i*Delta*beta(j => j) -0.5*gam*beta(j => j) +i*Uint*beta(j => j)*alpha(j => j)*beta(j => j) -0.5*i*Uint*beta(j => j) -i*J_hop_plus(j => j)*beta(j => j_plus) -i*J_hop_minus(j => j)*beta(j => j_minus) +i*conj(F) +sqrt(i*Uint)*beta(j => j)*XiB(j => j);
         ]]>
       </operators>
 
@@ -135,7 +135,7 @@
   <output filename="file_output.xsil" format="hdf5">
     <sampling_group basis="j" initial_sample="yes">
       <dependencies>
-        wavefunction
+        trajectory
       </dependencies>
       <moments>
         alphaR
