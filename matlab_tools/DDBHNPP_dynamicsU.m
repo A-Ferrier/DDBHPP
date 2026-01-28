@@ -13,8 +13,8 @@ means_g2_t = zeros(nbins, length(t));
 for nb = 1:nbins
     
     % Observables calculated for each bin...
-    n_bin =  real(mean(mean(alpha((S_bin*(nb-1)+1):S_bin*nb,:,:).*beta((S_bin*(nb-1)+1):S_bin*nb,init:end,:), 1), 3));
-    g2_bin = real(mean(mean((alpha((S_bin*(nb-1)+1):S_bin*nb,:,:).*beta((S_bin*(nb-1)+1):S_bin*nb,init:end,:)).^2, 1), 3))./n_bin.^2;
+    n_bin =  real(mean(mean(alpha((S_bin*(nb-1)+1):S_bin*nb,:,:).*beta((S_bin*(nb-1)+1):S_bin*nb,:,:), 1), 3));
+    g2_bin = real(mean(mean((alpha((S_bin*(nb-1)+1):S_bin*nb,:,:).*beta((S_bin*(nb-1)+1):S_bin*nb,:,:)).^2, 1), 3))./n_bin.^2;
     
     % ...and assigned to means vectors
     means_n_t(nb,:) = n_bin;
