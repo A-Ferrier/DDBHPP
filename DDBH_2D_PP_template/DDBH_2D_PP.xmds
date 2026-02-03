@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simulation xmds-version="2">
+
+  <author>
+    A Ferrier
+  </author>
+
+  <description>
+    Driven-Dissipative Bose-Hubbard model
+    for NxN site 2 dimensional square lattice
+    Positive P version
+  </description>
+
+  <features>
+    <benchmark />
+    <bing />
+    <halt_non_finite />
+    <auto_vectorise />
+    <validation kind="run-time" />
+    <arguments>
+
+      <!-- Numerical Specifications -->
+      <argument name="Ttot" type="real" default_value="100"	/>
+      
+      <!-- System Size -->
+      <argument name="N" type="integer" default_value="3"    />
+
+      <!-- Parameter Specifications -->
+      <argument name="gam" type="real" default_value="1.0"	/>
+      <argument name="Uint" type="real" default_value="1.5"	        />
+      <argument name="Delta" type="real" default_value="-2.0"      />
+      <argument name="Jhop" type="real" default_value="1.0"      />
+           
+      <!-- Pump Specifications -->
+      <argument name="FPmp" type="real" default_value="1.0" />
+
+      <!-- Seeding noise vector. -->
+      <argument name="seed1" type="integer" default_value="8"	/>
+      <argument name="seed2" type="integer" default_value="6"   />
+      <argument name="seed3" type="integer" default_value="5"   />
+
+    </arguments>
+  </features> 
+
+  <geometry>
+    <propagation_dimension>
+      t
+    </propagation_dimension>
+    <transverse_dimensions>
+      <dimension name="x" type="integer" lattice="N" domain="(1,N)" />
+      <dimension name="y" type="integer" lattice="N" domain="(1,N)" />
+    </transverse_dimensions>
+  </geometry>
+
+<!-- %%%% Fixed initial state  %% -->
+  <vector name="trajectory" type="complex" dimensions="x y">
+    <components>
+      alpha
+      beta
+    </components>
+    <initialisation>
+      <![CDATA[
+        alpha = 0;
+		beta = 0;
+       ]]>
+    </initialisation>
+  </vector>
+  
+  <!-- Pumping, allowing for spatially non-uniform drive.  Default set to uniform all F = FPmp -->
+  <vector name="pump" type="complex" dimensions="x y">
+    <components>
+      F
+    </components>
+    <initialisation>
+      <![CDATA[
+        F = FPmp;
+       ]]>
+    </initialisation>
+  </vector>
+
+<!--- %%%%% Hopping coefficients x,y -> x+1,y , x,y -> x-1,y , x,y -> x,y+1 & x,y -> x,y-1 for each site,
+      can also be used to define boundary conditions.  All = Jhop means uniform hopping on torus (periodic boundaries) -->
+  <vector name="hoppings" type="real" dimensions="x y">
+    <components>
+      J_hop_xp J_hop_xm J_hop_yp J_hop_ym 
+    </components>
+    <initialisation>
+      <![CDATA[
+        J_hop_xp = Jhop;
+		J_hop_xm = Jhop;
+		J_hop_yp = Jhop;
+        J_hop_ym = Jhop;
+       ]]>
+    </initialisation>
+  </vector>
+
+  <noise_vector name="QNoise" dimensions="x y" kind="wiener" type="real" method="dsfmt" seed="seed1 seed2 seed3">
+    <components>
+      XiA
+      XiB
+    </components>
+  </noise_vector>
+
+  <sequence>
+    <integrate algorithm="RK4" interval="Ttot" steps="100000">
+      <samples>
+        1000
+      </samples>     
+
+      <operators>
+
+        <dependencies>
+          QNoise hoppings pump
+        </dependencies>
+
+        <integration_vectors>
+          trajectory
+        </integration_vectors>
+ 
+        <![CDATA[                                                                        
+      	  int x_plus = (x%N) + 1;
+		  int x_minus = N - (N+1-x)%N;
+          int y_plus = (y%N) + 1;
+          int y_minus = N - (N+1-y)%N;
+	  
+          dalpha_dt = i*Delta*alpha -0.5*gam*alpha -i*Uint*alpha*beta*alpha +0.5*i*Uint*alpha -i*F +sqrt(i*Uint)*i*alpha*XiA 
+			+i*J_hop_xp(x => x, y => y)*alpha(x => x_plus, y => y) +i*J_hop_xm(x => x, y => y)*alpha(x => x_minus, y => y) 
+			+i*J_hop_yp(x => x, y => y)*alpha(x => x, y => y_plus) +i*J_hop_ym(x => x, y => y)*alpha(x => x, y => y_minus);
+
+		  dbeta_dt = -i*Delta*beta -0.5*gam*beta +i*Uint*beta*alpha*beta -0.5*i*Uint*beta +i*conj(F) +sqrt(i*Uint)*beta*XiB 
+			-i*J_hop_xp(x => x, y => y)*beta(x => x_plus, y => y) -i*J_hop_xm(x => x, y => y)*beta(x => x_minus, y => y)
+            -i*J_hop_yp(x => x, y => y)*beta(x => x, y => y_plus) -i*J_hop_ym(x => x, y => y)*beta(x => x, y => y_minus);
+        ]]>
+      </operators>
+
+    </integrate>
+
+  </sequence>
+
+<!-- %%%%%%%%%%%%%% Alex's Saving data %%%%%%%%%%%%%%%%%%% -->
+
+  <output filename="file_output.xsil" format="hdf5">
+    <sampling_group basis="x y" initial_sample="yes">
+      <dependencies>
+        trajectory
+      </dependencies>
+      <moments>
+        alphaR
+        alphaI
+		betaR
+		betaI
+      </moments>
+      <![CDATA[
+        _SAMPLE_COMPLEX(alpha);
+		_SAMPLE_COMPLEX(beta);
+      ]]>
+    </sampling_group>
+
+  </output>
+
+</simulation>
