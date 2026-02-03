@@ -52,7 +52,7 @@
     </transverse_dimensions>
   </geometry>
 
-<!-- %%%% Fixed initial state  %% -->
+<!-- %% phase space variables, initial state 0  %% -->
   <vector name="trajectory" type="complex" dimensions="x y">
     <components>
       alpha
@@ -94,6 +94,7 @@
     </initialisation>
   </vector>
 
+<!--  %% Real Noise from interactions %% -->
   <noise_vector name="QNoise" dimensions="x y" kind="wiener" type="real" method="dsfmt" seed="seed1 seed2 seed3">
     <components>
       XiA
@@ -101,6 +102,7 @@
     </components>
   </noise_vector>
 
+<!-- Integrate element to solve for trajectories -->
   <sequence>
     <integrate algorithm="RK4" interval="Ttot" steps="100000">
       <samples>
@@ -137,7 +139,7 @@
 
   </sequence>
 
-<!-- %%%%%%%%%%%%%% Alex's Saving data %%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%% Saving data %%%%%%%%%%%%%%%%%%% -->
 
   <output filename="file_output.xsil" format="hdf5">
     <sampling_group basis="x y" initial_sample="yes">
