@@ -21,6 +21,8 @@ from inside the simulation directory.
 
 ## Available geomerties
 
-DDBH_1site_PP_template: Single site (0D) nonlinear bosonic model with drive and dissipation.
-DDBH_Nsite_PP_template: N site 1D chain driven-dissipative Bose-Hubbard model.
-DDBH_2D_PP_template: N*N site 2D square lattice driven-dissipative Bose-Hubbard model.
+DDBH_1site_PP_template: Single site (0D) nonlinear bosonic model with drive and dissipation.  
+
+DDBH_Nsite_PP_template: N site 1D chain driven-dissipative Bose-Hubbard model.  
+
+DDBH_2D_PP_template: N*N site 2D square lattice driven-dissipative Bose-Hubbard model.  
