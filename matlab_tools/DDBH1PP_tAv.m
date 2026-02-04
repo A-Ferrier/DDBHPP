@@ -16,8 +16,8 @@ means_g2 = zeros(nbins, 1);
 for nb = 1:nbins
     
     % Observables calculated for each bin...
-    n_Av_bin =  real(mean(mean(alpha((S_bin*(nb-1)+1):S_bin*nb,init:end,:).*beta((S_bin*(nb-1)+1):S_bin*nb,init:end,:), 1), 2));
-    g2_bin = real(mean(mean((alpha((S_bin*(nb-1)+1):S_bin*nb,init:end,:).*beta((S_bin*(nb-1)+1):S_bin*nb,init:end,:)).^2, 1), 2))./n_Av_bin.^2;
+    n_Av_bin =  real(mean(mean(alpha((S_bin*(nb-1)+1):S_bin*nb,init:end).*beta((S_bin*(nb-1)+1):S_bin*nb,init:end), 1), 2));
+    g2_bin = real(mean(mean((alpha((S_bin*(nb-1)+1):S_bin*nb,init:end).*beta((S_bin*(nb-1)+1):S_bin*nb,init:end)).^2, 1), 2))./n_Av_bin.^2;
     
     % ...and assigned to means vectors
     means_n_Av(nb) = n_Av_bin;
