@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simulation xmds-version="2">
+
+  <author>
+    A Ferrier
+  </author>
+
+  <description>
+    Driven-Dissipative nonlinear Boson model
+    1 site (0D)
+    Positive P version
+  </description>
+
+  <features>
+    <benchmark />
+    <bing />
+    <halt_non_finite />
+    <auto_vectorise />
+    <validation kind="run-time" />
+    <arguments>
+
+      <!-- Numerical Specifications -->
+      <argument name="Ttot" type="real" default_value="100"	/>
+
+      <!-- Parameter Specifications -->
+      <argument name="gam" type="real" default_value="1.0"	/>
+      <argument name="Uint" type="real" default_value="1.5"	        />
+      <argument name="Delta" type="real" default_value="-2.0"      />
+           
+      <!-- Pump Specifications -->
+      <argument name="FPmp" type="real" default_value="1.0" />
+
+      <!-- Seeding noise vector. -->
+      <argument name="seed1" type="integer" default_value="8"	/>
+      <argument name="seed2" type="integer" default_value="6"   />
+      <argument name="seed3" type="integer" default_value="5"   />
+
+    </arguments>
+  </features> 
+
+  <geometry>
+    <propagation_dimension>
+      t
+    </propagation_dimension>
+  </geometry>
+
+<!-- %% phase space variables, initial state 0  %% -->
+  <vector name="trajectory" type="complex" dimensions=" ">
+    <components>
+      alpha
+      beta
+    </components>
+    <initialisation>
+      <![CDATA[
+        alpha = 0;
+		    beta = 0;
+       ]]>
+    </initialisation>
+  </vector>
+
+<!--  %% Real Noise from interactions %% -->
+  <noise_vector name="QNoise" dimensions=" " kind="wiener" type="real" method="dsfmt" seed="seed1 seed2 seed3">
+    <components>
+      XiA
+      XiB
+    </components>
+  </noise_vector>
+
+<!-- Integrate element to solve for trajectories -->
+  <sequence>
+    <integrate algorithm="RK4" interval="Ttot" steps="100000">
+      <samples>
+        1000
+      </samples>     
+
+      <operators>
+
+        <dependencies>
+          QNoise 
+        </dependencies>
+
+        <integration_vectors>
+          trajectory
+        </integration_vectors>
+ 
+        <![CDATA[                                                                        
+	  
+          dalpha_dt = i*Delta*alpha -0.5*gam*alpha -i*Uint*alpha*beta*alpha +0.5*i*Uint*alpha -i*FPmp +sqrt(i*Uint)*i*alpha*XiA;
+
+	  	    dbeta_dt = -i*Delta*beta -0.5*gam*beta +i*Uint*beta*alpha*beta -0.5*i*Uint*beta +i*FPmp +sqrt(i*Uint)*beta*XiB;
+        ]]>
+      </operators>
+
+    </integrate>
+
+  </sequence>
+
+<!-- %%%%%%%%%%%%%% Saving data %%%%%%%%%%%%%%%%%%% -->
+
+  <output filename="file_output.xsil" format="hdf5">
+    <sampling_group basis=" " initial_sample="yes">
+      <dependencies>
+        trajectory
+      </dependencies>
+      <moments>
+        alphaR
+        alphaI
+		    betaR
+		    betaI
+      </moments>
+      <![CDATA[
+        _SAMPLE_COMPLEX(alpha);
+		    _SAMPLE_COMPLEX(beta);
+      ]]>
+    </sampling_group>
+
+  </output>
+
+</simulation>
