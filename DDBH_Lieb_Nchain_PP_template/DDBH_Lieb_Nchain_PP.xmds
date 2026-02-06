@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simulation xmds-version="2">
+
+  <author>
+    A Ferrier
+  </author>
+
+  <description>
+    Driven-Dissipative Bose-Hubbard model
+    for N Lieb unit cells in 1 dimensional chain
+    Positive P version 
+  </description>
+
+  <features>
+    <benchmark />
+    <bing />
+    <halt_non_finite />
+    <auto_vectorise />
+    <validation kind="run-time" />
+    <arguments>
+
+      <!-- Numerical Specifications -->
+      <argument name="Ttot" type="real" default_value="1000"	/>
+      
+      <!-- System Size 3*N sites total -->
+      <argument name="N" type="integer" default_value="3"    />
+
+      <!-- Parameter Specifications -->
+      <argument name="gam" type="real" default_value="1.0"	/>
+      <argument name="Uint" type="real" default_value="1.5"	        />
+      <argument name="Delta" type="real" default_value="-2.0"      />
+      <argument name="Jhop" type="real" default_value="1.0"      />
+           
+      <!-- Pump Specifications -->
+      <argument name="FPmp" type="real" default_value="1.0" />
+
+      <!-- Seeding noise vector. -->
+      <argument name="seed1" type="integer" default_value="8"	/>
+      <argument name="seed2" type="integer" default_value="6"   />
+      <argument name="seed3" type="integer" default_value="5"   />
+
+    </arguments>
+  </features> 
+
+  <geometry>
+    <propagation_dimension>
+      t
+    </propagation_dimension>
+    <transverse_dimensions>
+      <dimension name="j" type="integer" lattice="N" domain="(1,N)" />
+    </transverse_dimensions>
+  </geometry>
+
+<!-- %% phase space variables, initial state 0  %% -->
+  <vector name="trajectory" type="complex" dimensions="j">
+    <components>
+      alphaA
+      betaA
+      alphaB
+      betaB
+      alphaC
+      betaC
+    </components>
+    <initialisation>
+      <![CDATA[
+        alphaA = 0;
+		betaA = 0;
+		alphaB = 0;
+        betaB = 0;
+		alphaC = 0;
+        betaC = 0;
+       ]]>
+    </initialisation>
+  </vector>
+
+<!--- %%%%% Hopping coefficients: ABcell  unit cell internal hopping A(j)<->B(j), BCcell unit cell internal hopping B(j)<->C(j), ABplus intercell hopping A(j)<->B(j+1), ABminus intercell hopping B(j)<->A(j-1); can also be used to define boundary conditions.  All = Jhop means uniform hopping on a ring (periodic boundaries) -->
+  <vector name="hoppings" type="real" dimensions="j">
+    <components>
+    	Jhop_ABplus Jhop_ABminus Jhop_ABcell Jhop_BCcell
+    </components>
+
+    <initialisation>
+      <![CDATA[
+        Jhop_ABplus = Jhop;
+		Jhop_ABminus = Jhop;
+		Jhop_ABcell = Jhop;
+		Jhop_BCcell = Jhop;
+       ]]>
+    </initialisation>
+  </vector>
+  
+<!-- Coherent drives for each sublattice, allowing for spatially nonuniform drive. Default set F_C = FPmp for all unit cells, all F_A = F_B = 0 -->  
+  <vector name="pump" type="complex" dimensions="j">
+    <components> F_A F_B F_C </components>
+    <initialisation>
+      <![CDATA[
+		F_A = 0;
+		F_B = 0;
+		F_C = FPmp;
+      ]]>
+    </initialisation>
+  </vector>
+
+<!--  %% Real Noise from interactions %% -->
+  <noise_vector name="QNoise" dimensions="j" kind="wiener" type="real" method="dsfmt" seed="seed1 seed2 seed3">
+    <components>
+      xi1A
+      xi2A
+      xi1B
+      xi2B
+      xi1C
+      xi2C
+    </components>
+  </noise_vector>
+
+<!-- Integrate element to solve for trajectories -->
+  <sequence>
+    <integrate algorithm="RK4" interval="Ttot" steps="100000">
+      <samples>
+        100
+      </samples>     
+
+      <operators>
+
+        <dependencies>
+          QNoise hoppings pump
+        </dependencies>
+
+        <integration_vectors>
+          trajectory
+        </integration_vectors>
+ 
+        <![CDATA[                                                                        
+      	  int j_plus = (j%N) +1;
+		  int j_minus = N -(N+1-j)%N;
+         
+          dalphaA_dt(j => j) = i*Delta*alphaA(j => j) -0.5*gam*alphaA(j => j) -i*F_A(j => j)
+			-i*Uint*betaA(j => j)*alphaA(j => j)*alphaA(j => j) +0.5*i*Uint*alphaA(j => j) 
+			+i*Jhop_ABcell(j => j)*alphaB(j => j) +i*Jhop_ABplus(j => j)*alphaB(j => j_plus) 
+			+sqrt(i*Uint)*i*alphaA(j => j)*xi1A(j => j);
+			
+          dbetaA_dt(j => j) = -i*Delta*betaA(j => j) -0.5*gam*betaA(j => j) +i*conj(F_A(j => j))
+			+i*Uint*betaA(j => j)*alphaA(j => j)*betaA(j => j) -0.5*i*Uint*betaA(j => j) 
+			-i*Jhop_ABcell(j => j)*betaB(j => j) -i*Jhop_ABplus(j => j)*betaB(j => j_plus) 
+			+sqrt(i*Uint)*betaA(j => j)*xi2A(j => j);
+			
+          dalphaB_dt(j => j) = i*Delta*alphaB(j => j) -0.5*gam*alphaB(j => j) -i*F_B(j => j)
+			-i*Uint*betaB(j => j)*alphaB(j => j)*alphaB(j => j) +0.5*i*Uint*alphaB(j => j) 
+			+i*Jhop_ABcell(j => j)*alphaA(j => j) +i*Jhop_ABminus(j => j)*alphaA(j => j_minus) +i*Jhop_BCcell(j => j)*alphaC(j => j) +sqrt(i*Uint)*i*alphaB(j => j)*xi1B(j => j);
+			
+          dbetaB_dt(j => j) = -i*Delta*betaB(j => j) -0.5*gam*betaB(j => j) +i*conj(F_B(j => j))
+			+i*Uint*betaB(j => j)*alphaB(j => j)*betaB(j => j) -0.5*i*Uint*betaB(j => j) 
+			-i*Jhop_ABcell(j => j)*betaA(j => j) -i*Jhop_ABminus(j => j)*betaA(j => j_minus) -i*Jhop_BCcell(j => j)*betaC(j => j) +sqrt(i*Uint)*betaB(j => j)*xi2B(j => j);
+			
+          dalphaC_dt(j => j) = i*Delta*alphaC(j => j) -0.5*gam*alphaC(j => j) -i*F_C(j => j)
+			-i*Uint*betaC(j => j)*alphaC(j => j)*alphaC(j => j) +0.5*i*Uint*alphaC(j => j) 
+			+i*Jhop_BCcell(j => j)*alphaB(j => j) +sqrt(i*Uint)*i*alphaC(j => j)*xi1C(j => j);
+			
+          dbetaC_dt(j => j) = -i*Delta*betaC(j => j) -0.5*gam*betaC(j => j) +i*conj(F_C(j => j))
+			+i*Uint*betaC(j => j)*alphaC(j => j)*betaC(j => j) -0.5*i*Uint*betaC(j => j) 
+			-i*Jhop_BCcell(j => j)*betaB(j => j) +sqrt(i*Uint)*betaC(j => j)*xi2C(j => j);
+	
+        ]]>
+      </operators>
+
+    </integrate>
+
+  </sequence>
+
+<!-- %%%%%%%%%%%%%% Saving data %%%%%%%%%%%%%%%%%%% -->
+
+  <output filename="file_output.xsil" format="hdf5">
+    <sampling_group basis="j" initial_sample="yes">
+      <dependencies>
+        trajectory
+      </dependencies>
+      <moments>
+        alphaAR
+        alphaAI
+		betaAR
+		betaAI
+		alphaBR
+        alphaBI
+        betaBR
+        betaBI
+		alphaCR
+        alphaCI
+        betaCR
+        betaCI
+      </moments>
+      <![CDATA[
+        _SAMPLE_COMPLEX(alphaA);
+		_SAMPLE_COMPLEX(betaA);
+		_SAMPLE_COMPLEX(alphaB);
+        _SAMPLE_COMPLEX(betaB);
+		_SAMPLE_COMPLEX(alphaC);
+        _SAMPLE_COMPLEX(betaC);
+      ]]>
+    </sampling_group>
+
+  </output>
+
+</simulation>
