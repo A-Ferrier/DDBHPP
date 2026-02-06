@@ -20,7 +20,7 @@ for ns = 1:nsamples
 end
 
 %Generate Output filename with system parameters
-filenameout = ['analysis_output_DDBH2D_' num2str(N) 'x' num2str(N) '_Delta' correctnum2str(Delta) '_U' correctnum2str(U) '_F' correctnum2str(F) '_J' correctnum2str(J) '_tf' num2str(tf)  '.mat'];
+filenameout = ['analysis_output_DDBH_' num2str(N) 'x' num2str(N) '_Delta' correctnum2str(Delta) '_U' correctnum2str(U) '_F' correctnum2str(F) '_J' correctnum2str(J) '_tf' num2str(tf)  '.mat'];
 
 %Read simulation output files and collect data
 [t, alpha, beta] = DDBH2DPP_output_sample(N, Delta, U, F, J, tf, nsamples);
