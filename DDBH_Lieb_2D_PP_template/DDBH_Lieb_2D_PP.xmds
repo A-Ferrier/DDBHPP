@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simulation xmds-version="2">
+
+  <author>
+    A Ferrier
+  </author>
+
+  <description>
+    Driven-Dissipative Bose-Hubbard model
+    for NxN unit cells of 2 dimensional Lieb lattice
+    Positive P version 
+  </description>
+
+  <features>
+    <benchmark />
+    <bing />
+    <halt_non_finite />
+    <auto_vectorise />
+    <validation kind="run-time" />
+    <arguments>
+
+      <!-- Numerical Specifications -->
+      <argument name="Ttot" type="real" default_value="100"	/>
+      
+      <!-- System Size 3*N*N sites total -->
+      <argument name="N" type="integer" default_value="3"    	/>
+
+      <!-- Parameter Specifications -->
+      <argument name="gam" type="real" default_value="1.0"	/>
+      <argument name="Uint" type="real" default_value="1.5"     />
+      <argument name="Delta" type="real" default_value="-2.0"  	/>
+      <argument name="Jhop" type="real" default_value="1.0"     />
+           
+      <!-- Pump Specifications -->
+      <argument name="FPmp" type="real" default_value="1.0" 	/>
+
+      <!-- Seeding noise vector. -->
+      <argument name="seed1" type="integer" default_value="8"	/>
+      <argument name="seed2" type="integer" default_value="6"   />
+      <argument name="seed3" type="integer" default_value="5"   />
+
+    </arguments>
+  </features> 
+
+  <geometry>
+    <propagation_dimension>
+      t
+    </propagation_dimension>
+    <transverse_dimensions>
+      <dimension name="x" type="integer" lattice="N" domain="(1,N)" />
+      <dimension name="y" type="integer" lattice="N" domain="(1,N)" />
+    </transverse_dimensions>
+  </geometry>
+
+
+<!-- %% phase space variables, initial state 0  %% -->
+  <vector name="trajectory" type="complex" dimensions="x y">
+    <components>
+      alphaA
+      betaA
+      alphaB
+      betaB
+      alphaC
+      betaC
+    </components>
+    <initialisation>
+      <![CDATA[
+        alphaA = 0;
+		betaA = 0;
+		alphaB = 0;
+        betaB = 0;
+		alphaC = 0;
+        betaC = 0;
+       ]]>
+    </initialisation>
+  </vector>
+  
+<!-- Coherent drives for each sublattice, allowing for spatially nonuniform drive. Default set F_C = FPmp for all unit cells, all F_A = F_B = 0 -->
+ <vector name="pump" type="complex" dimensions="x y">
+    <components> F_A F_B F_C </components>
+    <initialisation>
+      <![CDATA[
+		F_A = 0;
+		F_B = 0;
+		F_C = FPmp;
+      ]]>
+    </initialisation>
+  </vector>
+
+<!--- %%%%% Hopping coefficients: ABcell  unit cell internal hopping A(x,y)<->B(x,y), BCcell unit cell internal hopping B(x,y)<->C(x,y), ABplus intercell hopping A(x,y)<->B(x+1,y), ABminus intercell hopping B(x,y)<->A(x-1,y), BCplus intercell hopping B(x,y)<->C(x,y+1), BCminus intercell hopping C(x,y)<->B(x,y-1); can also be used to define boundary conditions.  All = Jhop means uniform hopping on a torus (periodic boundaries) -->
+  <vector name="hoppings" type="real" dimensions="x y">
+    <components>
+    	Jhop_ABplus Jhop_ABminus Jhop_ABcell Jhop_BCplus Jhop_BCminus Jhop_BCcell
+    </components>
+
+    <initialisation>
+      <![CDATA[
+        Jhop_ABplus = Jhop;
+		Jhop_ABminus = Jhop;
+		Jhop_ABcell = Jhop;
+		Jhop_BCplus = Jhop;
+		Jhop_BCminus = Jhop;
+		Jhop_BCcell = Jhop;
+       ]]>
+    </initialisation>
+  </vector>
+
+<!--  %% Real Noise from interactions %% -->
+  <noise_vector name="QNoise" dimensions="x y" kind="wiener" type="real" method="dsfmt" seed="seed1 seed2 seed3">
+    <components>
+      xi1A
+      xi2A
+      xi1B
+      xi2B
+      xi1C
+      xi2C
+    </components>
+  </noise_vector>
+
+<!-- Integrate element to solve for trajectories -->
+  <sequence>
+    <integrate algorithm="RK4" interval="Ttot" steps="10000">
+      <samples>
+        1000
+      </samples>     
+
+      <operators>
+
+        <dependencies>
+          QNoise hoppings pump
+        </dependencies>
+
+        <integration_vectors>
+          trajectory
+        </integration_vectors>
+ 
+        <![CDATA[                                                                        
+      	  int x_plus = (x%N) +1;
+		  int x_minus = N -(N+1-x)%N;
+		  int y_plus = (y%N) +1;
+          int y_minus = N -(N+1-y)%N;
+         
+          dalphaA_dt(x => x, y => y) = i*Delta*alphaA(x => x, y => y) -0.5*gam*alphaA(x => x, y => y) -i*F_A(x => x, y => y)
+			-i*Uint*betaA(x => x, y => y)*alphaA(x => x, y => y)*alphaA(x => x, y => y) +0.5*i*Uint*alphaA(x => x, y => y)
+			+i*Jhop_ABcell(x => x, y => y)*alphaB(x => x, y => y) +i*Jhop_ABplus(x => x, y => y)*alphaB(x => x_plus, y => y) +sqrt(i*Uint)*i*alphaA(x => x, y => y)*xi1A(x => x, y => y);
+
+          dbetaA_dt(x => x, y => y) = -i*Delta*betaA(x => x, y => y) -0.5*gam*betaA(x => x, y => y) +i*conj(F_A(x => x, y => y))
+			+i*Uint*betaA(x => x, y => y)*alphaA(x => x, y => y)*betaA(x => x, y => y) -0.5*i*Uint*betaA(x => x, y => y) 
+			-i*Jhop_ABcell(x => x, y => y)*betaB(x => x, y => y) -i*Jhop_ABplus(x => x, y => y)*betaB(x => x_plus, y => y) 
+			+sqrt(i*Uint)*betaA(x => x, y => y)*xi2A(x => x, y => y);
+
+          dalphaB_dt(x => x, y => y) = i*Delta*alphaB(x => x, y => y) -0.5*gam*alphaB(x => x, y => y) -i*F_B(x => x, y => y)
+			-i*Uint*betaB(x => x, y => y)*alphaB(x => x, y => y)*alphaB(x => x, y => y) +0.5*i*Uint*alphaB(x => x, y => y) 
+			+i*Jhop_ABcell(x => x, y => y)*alphaA(x => x, y => y) +i*Jhop_ABminus(x => x, y => y)*alphaA(x => x_minus, y => y)
+			+i*Jhop_BCcell(x => x, y => y)*alphaC(x => x, y => y) +i*Jhop_BCplus(x => x, y => y)*alphaC(x => x, y => y_plus) +sqrt(i*Uint)*i*alphaB(x => x, y => y)*xi1B(x => x, y => y);
+
+          dbetaB_dt(x => x, y => y) = -i*Delta*betaB(x => x, y => y) -0.5*gam*betaB(x => x, y => y) +i*conj(F_B(x => x, y => y))
+			+i*Uint*betaB(x => x, y => y)*alphaB(x => x, y => y)*betaB(x => x, y => y) -0.5*i*Uint*betaB(x => x, y => y) 
+			-i*Jhop_ABcell(x => x, y => y)*betaA(x => x, y => y) -i*Jhop_ABminus(x => x, y => y)*betaA(x => x_minus, y => y) 
+			-i*Jhop_BCcell(x => x, y => y)*betaC(x => x, y => y) -i*Jhop_BCplus(x => x, y => y)*betaC(x => x, y => y_plus) 
+			+sqrt(i*Uint)*betaB(x => x, y => y)*xi2B(x => x, y => y);
+
+          dalphaC_dt(x => x, y => y) = i*Delta*alphaC(x => x, y => y) -0.5*gam*alphaC(x => x, y => y) -i*F_C(x => x, y => y) 
+			-i*Uint*betaC(x => x, y => y)*alphaC(x => x, y => y)*alphaC(x => x, y => y) +0.5*i*Uint*alphaC(x => x, y => y) 
+			+i*Jhop_BCcell(x => x, y => y)*alphaB(x => x, y => y) +i*Jhop_BCminus(x => x, y => y)*alphaB(x => x, y => y_minus) +sqrt(i*Uint)*i*alphaC(x => x, y => y)*xi1C(x => x, y => y);
+
+          dbetaC_dt(x => x, y => y) = -i*Delta*betaC(x => x, y => y) -0.5*gam*betaC(x => x, y => y) +i*conj(F_C(x => x, y => y)) 
+			+i*Uint*betaC(x => x, y => y)*alphaC(x => x, y => y)*betaC(x => x, y => y) -0.5*i*Uint*betaC(x => x, y => y) 
+			-i*Jhop_BCcell(x => x, y => y)*betaB(x => x, y => y) -i*Jhop_BCminus(x => x, y => y)*betaB(x => x, y => y_minus) 
+			+sqrt(i*Uint)*betaC(x => x, y => y)*xi2C(x => x, y => y);
+
+        ]]>
+      </operators>
+
+    </integrate>
+
+  </sequence>
+
+<!-- %%%%%%%%%%%%%% Saving data %%%%%%%%%%%%%%%%%%% -->
+
+  <output filename="file_output.xsil" format="hdf5">
+    <sampling_group basis="x y" initial_sample="yes">
+      <dependencies>
+        trajectory
+      </dependencies>
+      <moments>
+        alphaAR
+        alphaAI
+		betaAR
+		betaAI
+		alphaBR
+        alphaBI
+        betaBR
+        betaBI
+		alphaCR
+        alphaCI
+        betaCR
+        betaCI
+      </moments>
+      <![CDATA[
+        _SAMPLE_COMPLEX(alphaA);
+		_SAMPLE_COMPLEX(betaA);
+		_SAMPLE_COMPLEX(alphaB);
+        _SAMPLE_COMPLEX(betaB);
+		_SAMPLE_COMPLEX(alphaC);
+        _SAMPLE_COMPLEX(betaC);
+      ]]>
+    </sampling_group>
+
+  </output>
+
+</simulation>
