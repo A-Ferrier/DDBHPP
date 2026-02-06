@@ -2,7 +2,7 @@
 function [t, alphaA, alphaB, alphaC, betaA, betaB, betaC] = DDBH2DLiebPP_output_sample(N, Delta, U, F, J, tf, nsamples)
 
 % Function for collecting all output data of many realisations of
-% DDBH_Lieb_2D with Parameters U, F, J, Delta, with nsamples realisations at time tf.  
+% DDBH_Lieb_2D Positive P with Parameters U, F, J, Delta, with nsamples realisations at time tf.  
 
     %Loop over realisations to read
     for nsample = 1:nsamples
