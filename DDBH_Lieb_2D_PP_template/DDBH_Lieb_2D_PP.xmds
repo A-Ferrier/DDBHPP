@@ -142,7 +142,8 @@
          
           dalphaA_dt(x => x, y => y) = i*Delta*alphaA(x => x, y => y) -0.5*gam*alphaA(x => x, y => y) -i*F_A(x => x, y => y)
 			-i*Uint*betaA(x => x, y => y)*alphaA(x => x, y => y)*alphaA(x => x, y => y) +0.5*i*Uint*alphaA(x => x, y => y)
-			+i*Jhop_ABcell(x => x, y => y)*alphaB(x => x, y => y) +i*Jhop_ABplus(x => x, y => y)*alphaB(x => x_plus, y => y) +sqrt(i*Uint)*i*alphaA(x => x, y => y)*xi1A(x => x, y => y);
+			+i*Jhop_ABcell(x => x, y => y)*alphaB(x => x, y => y) +i*Jhop_ABplus(x => x, y => y)*alphaB(x => x_plus, y => y) 
+			+sqrt(i*Uint)*i*alphaA(x => x, y => y)*xi1A(x => x, y => y);
 
           dbetaA_dt(x => x, y => y) = -i*Delta*betaA(x => x, y => y) -0.5*gam*betaA(x => x, y => y) +i*conj(F_A(x => x, y => y))
 			+i*Uint*betaA(x => x, y => y)*alphaA(x => x, y => y)*betaA(x => x, y => y) -0.5*i*Uint*betaA(x => x, y => y) 
@@ -152,7 +153,8 @@
           dalphaB_dt(x => x, y => y) = i*Delta*alphaB(x => x, y => y) -0.5*gam*alphaB(x => x, y => y) -i*F_B(x => x, y => y)
 			-i*Uint*betaB(x => x, y => y)*alphaB(x => x, y => y)*alphaB(x => x, y => y) +0.5*i*Uint*alphaB(x => x, y => y) 
 			+i*Jhop_ABcell(x => x, y => y)*alphaA(x => x, y => y) +i*Jhop_ABminus(x => x, y => y)*alphaA(x => x_minus, y => y)
-			+i*Jhop_BCcell(x => x, y => y)*alphaC(x => x, y => y) +i*Jhop_BCplus(x => x, y => y)*alphaC(x => x, y => y_plus) +sqrt(i*Uint)*i*alphaB(x => x, y => y)*xi1B(x => x, y => y);
+			+i*Jhop_BCcell(x => x, y => y)*alphaC(x => x, y => y) +i*Jhop_BCplus(x => x, y => y)*alphaC(x => x, y => y_plus) 
+			+sqrt(i*Uint)*i*alphaB(x => x, y => y)*xi1B(x => x, y => y);
 
           dbetaB_dt(x => x, y => y) = -i*Delta*betaB(x => x, y => y) -0.5*gam*betaB(x => x, y => y) +i*conj(F_B(x => x, y => y))
 			+i*Uint*betaB(x => x, y => y)*alphaB(x => x, y => y)*betaB(x => x, y => y) -0.5*i*Uint*betaB(x => x, y => y) 
@@ -162,7 +164,8 @@
 
           dalphaC_dt(x => x, y => y) = i*Delta*alphaC(x => x, y => y) -0.5*gam*alphaC(x => x, y => y) -i*F_C(x => x, y => y) 
 			-i*Uint*betaC(x => x, y => y)*alphaC(x => x, y => y)*alphaC(x => x, y => y) +0.5*i*Uint*alphaC(x => x, y => y) 
-			+i*Jhop_BCcell(x => x, y => y)*alphaB(x => x, y => y) +i*Jhop_BCminus(x => x, y => y)*alphaB(x => x, y => y_minus) +sqrt(i*Uint)*i*alphaC(x => x, y => y)*xi1C(x => x, y => y);
+			+i*Jhop_BCcell(x => x, y => y)*alphaB(x => x, y => y) +i*Jhop_BCminus(x => x, y => y)*alphaB(x => x, y => y_minus) 
+			+sqrt(i*Uint)*i*alphaC(x => x, y => y)*xi1C(x => x, y => y);
 
           dbetaC_dt(x => x, y => y) = -i*Delta*betaC(x => x, y => y) -0.5*gam*betaC(x => x, y => y) +i*conj(F_C(x => x, y => y)) 
 			+i*Uint*betaC(x => x, y => y)*alphaC(x => x, y => y)*betaC(x => x, y => y) -0.5*i*Uint*betaC(x => x, y => y) 
