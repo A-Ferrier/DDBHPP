@@ -146,11 +146,13 @@
 			
           dalphaB_dt(j => j) = i*Delta*alphaB(j => j) -0.5*gam*alphaB(j => j) -i*F_B(j => j)
 			-i*Uint*betaB(j => j)*alphaB(j => j)*alphaB(j => j) +0.5*i*Uint*alphaB(j => j) 
-			+i*Jhop_ABcell(j => j)*alphaA(j => j) +i*Jhop_ABminus(j => j)*alphaA(j => j_minus) +i*Jhop_BCcell(j => j)*alphaC(j => j) +sqrt(i*Uint)*i*alphaB(j => j)*xi1B(j => j);
+			+i*Jhop_ABcell(j => j)*alphaA(j => j) +i*Jhop_ABminus(j => j)*alphaA(j => j_minus) 
+			+i*Jhop_BCcell(j => j)*alphaC(j => j) +sqrt(i*Uint)*i*alphaB(j => j)*xi1B(j => j);
 			
           dbetaB_dt(j => j) = -i*Delta*betaB(j => j) -0.5*gam*betaB(j => j) +i*conj(F_B(j => j))
 			+i*Uint*betaB(j => j)*alphaB(j => j)*betaB(j => j) -0.5*i*Uint*betaB(j => j) 
-			-i*Jhop_ABcell(j => j)*betaA(j => j) -i*Jhop_ABminus(j => j)*betaA(j => j_minus) -i*Jhop_BCcell(j => j)*betaC(j => j) +sqrt(i*Uint)*betaB(j => j)*xi2B(j => j);
+			-i*Jhop_ABcell(j => j)*betaA(j => j) -i*Jhop_ABminus(j => j)*betaA(j => j_minus) 
+			-i*Jhop_BCcell(j => j)*betaC(j => j) +sqrt(i*Uint)*betaB(j => j)*xi2B(j => j);
 			
           dalphaC_dt(j => j) = i*Delta*alphaC(j => j) -0.5*gam*alphaC(j => j) -i*F_C(j => j)
 			-i*Uint*betaC(j => j)*alphaC(j => j)*alphaC(j => j) +0.5*i*Uint*alphaC(j => j) 
