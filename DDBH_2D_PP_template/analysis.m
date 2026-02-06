@@ -12,7 +12,7 @@ tf = 1000; % Final time
 nsamples = 1000;
 
 %Add all relevant directories to path
-toolspath = '../matlab_tools' % Set to matlab_tools directory location
+toolspath = '../matlab_tools'; % Set to matlab_tools directory location
 addpath(toolspath)
 addpath('./')
 for ns = 1:nsamples
