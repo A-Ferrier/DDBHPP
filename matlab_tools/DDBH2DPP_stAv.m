@@ -1,5 +1,5 @@
 
-% Code to check occupations & g2 for N site 2D DDBH Positive P with time & spatial averaging
+% Code to check occupations & g2 for N*N site 2D DDBH Positive P with time & spatial averaging
 
 % Size and number of bins for error bar calculating process
 S_bin = nsamples/5; % Bin size for subensemble averaging
