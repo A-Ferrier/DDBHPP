@@ -17,12 +17,12 @@ means_g2C_t = zeros(nbins, length(t));
 for nb = 1:nbins
     
     % Observables calculated for each bin...
-    nA_bin =  real(mean(mean(mean(alphaA((S_bin*(nb-1)+1):S_bin*nb,:,:).*betaA((S_bin*(nb-1)+1):S_bin*nb,:,:), 1), 3), 4));
-    g2A_bin = real(mean(mean(mean((alphaA((S_bin*(nb-1)+1):S_bin*nb,:,:).*betaA((S_bin*(nb-1)+1):S_bin*nb,:,:)).^2, 1), 3), 4))./nA_bin.^2;
-    nB_bin =  real(mean(mean(mean(alphaB((S_bin*(nb-1)+1):S_bin*nb,:,:).*betaB((S_bin*(nb-1)+1):S_bin*nb,:,:), 1), 3), 4));
-    g2B_bin = real(mean(mean(mean((alphaB((S_bin*(nb-1)+1):S_bin*nb,:,:).*betaB((S_bin*(nb-1)+1):S_bin*nb,:,:)).^2, 1), 3), 4))./nB_bin.^2;
-    nC_bin =  real(mean(mean(mean(alphaC((S_bin*(nb-1)+1):S_bin*nb,:,:).*betaC((S_bin*(nb-1)+1):S_bin*nb,:,:), 1), 3), 4));
-    g2C_bin = real(mean(mean(mean((alphaC((S_bin*(nb-1)+1):S_bin*nb,:,:).*betaC((S_bin*(nb-1)+1):S_bin*nb,:,:)).^2, 1), 3), 4))./nC_bin.^2;
+    nA_bin =  real(mean(mean(mean(alphaA((S_bin*(nb-1)+1):S_bin*nb,:,:,:).*betaA((S_bin*(nb-1)+1):S_bin*nb,:,:,:), 1), 3), 4));
+    g2A_bin = real(mean(mean(mean((alphaA((S_bin*(nb-1)+1):S_bin*nb,:,:,:).*betaA((S_bin*(nb-1)+1):S_bin*nb,:,:,:)).^2, 1), 3), 4))./nA_bin.^2;
+    nB_bin =  real(mean(mean(mean(alphaB((S_bin*(nb-1)+1):S_bin*nb,:,:,:).*betaB((S_bin*(nb-1)+1):S_bin*nb,:,:,:), 1), 3), 4));
+    g2B_bin = real(mean(mean(mean((alphaB((S_bin*(nb-1)+1):S_bin*nb,:,:,:).*betaB((S_bin*(nb-1)+1):S_bin*nb,:,:,:)).^2, 1), 3), 4))./nB_bin.^2;
+    nC_bin =  real(mean(mean(mean(alphaC((S_bin*(nb-1)+1):S_bin*nb,:,:,:).*betaC((S_bin*(nb-1)+1):S_bin*nb,:,:,:), 1), 3), 4));
+    g2C_bin = real(mean(mean(mean((alphaC((S_bin*(nb-1)+1):S_bin*nb,:,:,:).*betaC((S_bin*(nb-1)+1):S_bin*nb,:,:,:)).^2, 1), 3), 4))./nC_bin.^2;
 
     % ...and assigned to means vectors
     means_nA_t(nb,:) = nA_bin;
