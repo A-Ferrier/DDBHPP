@@ -1,5 +1,5 @@
 
-% Code to check time evolution of occupations & g2 for N*N unit cell 2D DDBH Lieb Positive P with spatial averaging (for use with spatially uniform parameters)
+% Code to check time evolution of occupations & g2 for N*N unit cell (3*N*N site) 2D DDBH Lieb Positive P with spatial averaging (for use with spatially uniform parameters)
 
 % Size and number of bins for error bar calculating process
 S_bin = nsamples/5; % Bin size for subensemble averaging
