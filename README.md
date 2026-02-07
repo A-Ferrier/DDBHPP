@@ -25,8 +25,8 @@ DDBH_1site_PP_template: Single site (0D) nonlinear bosonic model with drive and 
 
 DDBH_Nsite_PP_template: N site 1D chain driven-dissipative Bose-Hubbard model.  
 
-DDBH_2D_PP_template: N*N site 2D square lattice driven-dissipative Bose-Hubbard model.  
+DDBH_2D_PP_template: N\*N site 2D square lattice driven-dissipative Bose-Hubbard model.  
 
-DDBH_Lieb_Nchain_PP_template: N unit cell (3*N site total) Quasi-1D Lieb lattice driven-dissipative Bose-Hubbard model connected along line of A,B sublattices with dangling C sites.
+DDBH_Lieb_Nchain_PP_template: N unit cell (3\*N site total) Quasi-1D Lieb lattice driven-dissipative Bose-Hubbard model connected along line of A,B sublattices with dangling C sites.
 
-DDBH_Lieb_2D_PP_template: N*N unit cell (3*N*N site total) 2D Lieb lattice driven-dissipative Bose-Hubbard model.  
+DDBH_Lieb_2D_PP_template: N\*N unit cell (3\*N\*N site total) 2D Lieb lattice driven-dissipative Bose-Hubbard model.  
