@@ -27,7 +27,7 @@ end
 
 % Calculate mean and error bar of bin means
 nj = mean(means_nj);
-g2j = mean(means_g2);
+g2j = mean(means_g2j);
 err_nj = std(means_nj);
 err_g2j = std(means_g2j);
 
