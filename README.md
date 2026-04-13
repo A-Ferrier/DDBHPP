@@ -19,7 +19,7 @@ matlab -nosplash -nodesktop -nodisplay < analysis.m
 ```
 from inside the simulation directory.  
 
-## Available geomerties
+## Available geometries
 
 DDBH_1site_PP_template: Single site (0D) nonlinear bosonic model with drive and dissipation.  
 
