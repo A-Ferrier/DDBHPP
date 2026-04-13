@@ -1,5 +1,5 @@
 # DDBHPP
-Positive-P simulations for Driven-dissipative Bose Hubbard models written for [xmds2](http://www.xmds.org/), with optional Matlab post-processing library.
+Positive-P simulations for driven dissipative Bose-Hubbard models written for [xmds2](http://www.xmds.org/), with optional Matlab post-processing library.
 
 ## Using the code for simulations 
 Once you have xmds2 installed, make a copy of the template directory for the geometry you wish to simulate, e.g. DDBH_Nsite_PP_template for 1D chains.  Use the command 
